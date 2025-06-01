@@ -1,0 +1,10 @@
+/bin/
+/build/
+*.exe
+*.test
+*.out
+*.log
+*.env
+.env.*
+vendor/
+.DS_Store
