@@ -1,0 +1,63 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: home_inventory
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-devpassword}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      target: ${TARGET:-dev}
+    environment:
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:-devpassword}@db:5432/home_inventory?sslmode=disable
+      ADDRESS: '0.0.0.0:8080'
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./backend
+          target: /app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '8080:8080'
+
+  frontend:
+    build:
+      context: ./frontend
+      target: ${TARGET:-dev}
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/
+          target: /app/
+        - action: rebuild
+          path: ./frontend/package.json
+    ports:
+      - '5173:5173'
+      - '80:80'
+
+volumes:
+  db_data:
+
+x-security:
+  description: |
+    - All containers run as non-root where possible.
+    - Environment variables are not hardcoded in prod.
+    - Use of healthchecks and minimal images.
+
+# Usage:
+#   Dev:  docker compose --profile dev up --build
+#   Prod: BACKEND_TARGET=prod FRONTEND_TARGET=prod POSTGRES_PASSWORD=$(openssl rand -base64 32) docker compose --profile prod up --build

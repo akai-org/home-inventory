@@ -1,0 +1,8 @@
+github.com/go-chi/chi/v5 v5.0.10 h1:rLz5avzKpjqxrYwXNfmjkrYYXOyLJd37pz53UFHC6vk=
+github.com/go-chi/chi/v5 v5.0.10/go.mod h1:DslCQbL2OYiznFReuXYUmQ2hGd1aDpCnlMNITLSKoi8=
+github.com/huntclauss/dotenv v0.0.2 h1:HCR9ijO3jCNY1TkUDktCColswqxkDb3YnqkZwZJnDSs=
+github.com/huntclauss/dotenv v0.0.2/go.mod h1:3hbtrRY43Pv3iKxsy+rJxt8SeSA8oc/NAQ3HDlGkVQo=
+github.com/huntclauss/dotenv v0.0.3 h1:VO8ehi5w6io0CuBji/07uomfQADWMnJpwlnS3nmhJgM=
+github.com/huntclauss/dotenv v0.0.3/go.mod h1:3hbtrRY43Pv3iKxsy+rJxt8SeSA8oc/NAQ3HDlGkVQo=
+github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=
+github.com/lib/pq v1.10.9/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
