@@ -1,2 +1,9 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visiting <a href="http://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to reads the documentation</p>
+<script lang="ts">
+	import { Breadcrumb } from "$components/breadcrumb";
+</script>
+
+<h1>Home Inventory System</h1>
+
+<main>
+	<Breadcrumb elements={[{ display: "test", link: "#" }]}></Breadcrumb>
+</main>
