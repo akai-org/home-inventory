@@ -6,6 +6,6 @@ RUN npm install --silent
 
 COPY . .
 
-FROM base as dev
+FROM base AS dev
 RUN echo "Dev mode"
 ENTRYPOINT ["npm", "run", "dev", "--", "--host"]
