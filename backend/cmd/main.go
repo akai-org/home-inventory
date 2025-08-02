@@ -27,5 +27,6 @@ func main() {
 	app := api.App{Router: chi.NewRouter(), Database: database}
 	api.RegisterRoutes(&app)
 
+	log.Printf("Server starting on %s", address)
 	http.ListenAndServe(address, app.Router)
 }

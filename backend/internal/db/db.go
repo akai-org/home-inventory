@@ -4,12 +4,45 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/akai-org/home-inventory/internal/models"
+	"github.com/google/uuid"
+
 	_ "github.com/lib/pq"
 )
 
 type DB interface {
 	Ping(ctx context.Context) error
-	// Add more methods as needed
+
+	// Storage operations
+	CreateStorage(ctx context.Context, storage *models.Storage) error
+	GetStorage(ctx context.Context, id uuid.UUID) (*models.Storage, error)
+	ListStorages(ctx context.Context, parentID *uuid.UUID) ([]*models.Storage, error)
+	UpdateStorage(ctx context.Context, storage *models.Storage) error
+	DeleteStorage(ctx context.Context, id uuid.UUID) error
+
+	// Item operations
+	CreateItem(ctx context.Context, item *models.Item) error
+	GetItem(ctx context.Context, id uuid.UUID) (*models.Item, error)
+	ListItems(ctx context.Context, storageID *uuid.UUID, filters ItemFilters) ([]*models.Item, error)
+	UpdateItem(ctx context.Context, item *models.Item) error
+	DeleteItem(ctx context.Context, id uuid.UUID) error
+
+	// Search operations
+	SearchItems(ctx context.Context, query string, filters ItemFilters) ([]*models.Item, error)
+
+	// QR Code operations
+	CreateQRCode(ctx context.Context, qrCode *models.QRCode) error
+	GetQRCode(ctx context.Context, codeData string) (*models.QRCode, error)
+
+	// Migration operations
+	RunMigrations(migrationsPath string) error
+}
+
+type ItemFilters struct {
+	Name      *string
+	Type      *string
+	Tags      []string
+	StorageID *uuid.UUID
 }
 
 type Postgres struct {
