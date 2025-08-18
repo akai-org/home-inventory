@@ -24,6 +24,10 @@ func main() {
 		log.Fatalf("failed to connect to db: %v", err)
 	}
 
+	if err := database.RunMigrations("migrations"); err != nil {
+		log.Fatalf("failed to run migrations: %v", err)
+	}
+
 	app := api.App{Router: chi.NewRouter(), Database: database}
 	api.RegisterRoutes(&app)
 

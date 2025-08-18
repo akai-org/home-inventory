@@ -3,6 +3,8 @@ package db
 import (
 	"context"
 	"database/sql"
+	"io/ioutil"
+	"path/filepath"
 
 	"github.com/akai-org/home-inventory/internal/models"
 	"github.com/google/uuid"
@@ -59,4 +61,28 @@ func NewPostgres(url string) (DB, error) {
 
 func (p *Postgres) Ping(ctx context.Context) error {
 	return p.db.PingContext(ctx)
+}
+
+func (p *Postgres) RunMigrations(migrationsPath string) error {
+	files, err := ioutil.ReadDir(migrationsPath)
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		if !file.IsDir() {
+			filePath := filepath.Join(migrationsPath, file.Name())
+			migration, err := ioutil.ReadFile(filePath)
+			if err != nil {
+				return err
+			}
+
+			_, err = p.db.Exec(string(migration))
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }

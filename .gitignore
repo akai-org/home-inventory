@@ -1,10 +1,23 @@
-# Node & Go
-node_modules/
-frontend/node_modules/
-backend/bin/
-backend/build/
-*.log
-*.env
-.env.*
+node_modules
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+
+# OS
 .DS_Store
-pnpm-lock.yaml
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
