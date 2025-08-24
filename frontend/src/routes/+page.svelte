@@ -2,48 +2,51 @@
 	import { onMount } from 'svelte';
 	import type { Item } from '$lib/types/models';
 	import { listItems, createItem } from '$lib/api/services';
+  import Layout from '$lib/components/Layout.svelte';
+  import ItemCard from '$lib/components/ItemCard.svelte';
+  import ItemForm from '$lib/components/ItemForm.svelte';
+  import ItemFilter from '$lib/components/ItemFilter.svelte';
 
 	let items: Item[] = [];
-	let newItem: Partial<Item> = {};
 
 	onMount(async () => {
 		items = await listItems();
 	});
 
-	async function handleAddItem() {
+	async function handleAddItem(event: CustomEvent<Item>) {
+    const newItem = event.detail;
 		if (newItem.name && newItem.type && newItem.description && newItem.storage_id) {
 			const createdItem = await createItem(newItem as Item);
 			items = [...items, createdItem];
-			newItem = {};
 		}
 	}
+
+  async function handleFilter(event: CustomEvent<{ name: string, type: string, tags: string }>) {
+    const { name, type, tags } = event.detail;
+    const filterParams = new URLSearchParams();
+    if (name) {
+      filterParams.append("name", name);
+    }
+    if (type) {
+      filterParams.append("type", type);
+    }
+    if (tags) {
+      filterParams.append("tags", tags);
+    }
+    items = await listItems(filterParams);
+  }
 </script>
 
-<h1>Home Inventory</h1>
+<Layout>
+  <h1>Home Inventory</h1>
 
-<form on:submit|preventDefault={handleAddItem}>
-	<input type="text" placeholder="Name" bind:value={newItem.name} />
-	<input type="text" placeholder="Type" bind:value={newItem.type} />
-	<input type="text" placeholder="Description" bind:value={newItem.description} />
-	<input type="text" placeholder="Storage ID" bind:value={newItem.storage_id} />
-	<button type="submit">Add Item</button>
-</form>
+  <ItemForm on:addItem={handleAddItem} />
 
-<table>
-	<thead>
-		<tr>
-			<th>Name</th>
-			<th>Type</th>
-			<th>Description</th>
-		</tr>
-	</thead>
-	<tbody>
-		{#each items as item}
-			<tr>
-				<td>{item.name}</td>
-				<td>{item.type}</td>
-				<td>{item.description}</td>
-			</tr>
-		{/each}
-	</tbody>
-</table>
+  <ItemFilter on:filter={handleFilter} />
+
+  <div>
+    {#each items as item}
+      <ItemCard {item} />
+    {/each}
+  </div>
+</Layout>
