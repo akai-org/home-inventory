@@ -1,29 +1,39 @@
-<nav>
-  <a href="/">Items</a>
-  <a href="/storages">Storages</a>
-</nav>
+<script>
+	import 'bootstrap/dist/css/bootstrap.min.css';
+	import { HouseDoor, Box, Archive } from 'svelte-bootstrap-icons';
+</script>
 
-<div class="container">
-  <slot />
+<div class="d-flex">
+	<div class="sidebar vh-100 p-3 bg-light">
+		<h4 class="mb-4">Home Inventory</h4>
+		<ul class="nav flex-column">
+			<li class="nav-item">
+				<a class="nav-link" href="/">
+					<HouseDoor />
+					Home
+				</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="/storages">
+					<Archive />
+					Storages
+				</a>
+			</li>
+		</ul>
+	</div>
+
+	<main class="p-4 w-100">
+		<slot />
+	</main>
 </div>
 
 <style>
-  .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-
-  nav {
-    display: flex;
-    justify-content: center;
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
-  }
-
-  nav a {
-    margin: 0 10px;
-    text-decoration: none;
-    color: #333;
-  }
+	.sidebar {
+		width: 280px;
+	}
+	.nav-link {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
 </style>

@@ -2,7 +2,6 @@
   import { onMount } from "svelte";
   import type { Storage } from "$lib/types/models";
   import { listStorages, createStorage } from "$lib/api/services";
-  import Layout from "$lib/components/Layout.svelte";
 
   let storages: Storage[] = [];
   let newStorage: Partial<Storage> = {};
@@ -20,17 +19,30 @@
   }
 </script>
 
-<Layout>
-  <h1>Storages</h1>
+<h1 class="mb-4">Storages</h1>
 
-  <form on:submit|preventDefault={handleAddStorage}>
-    <input type="text" placeholder="Name" bind:value={newStorage.name} />
-    <button type="submit">Add Storage</button>
-  </form>
-
-  <ul>
-    {#each storages as storage}
-      <li><a href="/storages/{storage.id}">{storage.name}</a></li>
-    {/each}
-  </ul>
-</Layout>
+<div class="row">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Add New Storage</h5>
+        <form on:submit|preventDefault={handleAddStorage}>
+          <div class="mb-3">
+            <label for="storageName" class="form-label">Name</label>
+            <input id="storageName" type="text" class="form-control" placeholder="Name" bind:value={newStorage.name} />
+          </div>
+          <button type="submit" class="btn btn-primary">Add Storage</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="list-group">
+      {#each storages as storage}
+        <a href="/storages/{storage.id}" class="list-group-item list-group-item-action">
+          {storage.name}
+        </a>
+      {/each}
+    </div>
+  </div>
+</div>

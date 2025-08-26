@@ -8,45 +8,42 @@
   let showBarcode = false;
 </script>
 
-<div class="card">
-  <h3>{item.name}</h3>
-  <p>{item.description}</p>
-  <p>Type: {item.type}</p>
-  {#if item.tags && item.tags.length > 0}
+<div class="card h-100">
+  <a href="/storages/{item.storage_id}/items/{item.id}">
+    <img src={item.image_url || 'https://via.placeholder.com/150'} class="card-img-top" alt={item.name}>
+  </a>
+  <div class="card-body">
+    <h5 class="card-title">{item.name}</h5>
+    <p class="card-text">{item.description}</p>
+    <p class="card-text"><small class="text-muted">Type: {item.type}</small></p>
+    {#if item.tags && item.tags.length > 0}
+      <div>
+        <strong>Tags:</strong>
+        {#each item.tags as tag}
+          <span class="badge bg-secondary me-1">{tag}</span>
+        {/each}
+      </div>
+    {/if}
+  </div>
+  <div class="card-footer d-flex justify-content-between">
     <div>
-      <strong>Tags:</strong>
-      {#each item.tags as tag}
-        <span>{tag}</span>
-      {/each}
+      <button class="btn btn-outline-primary btn-sm me-2" on:click={() => showQRCode = !showQRCode} title="{showQRCode ? 'Hide' : 'Show'} QR Code">
+        <i class="bi bi-qr-code"></i>
+      </button>
+      <button class="btn btn-outline-secondary btn-sm" on:click={() => showBarcode = !showBarcode} title="{showBarcode ? 'Hide' : 'Show'} Barcode">
+        <i class="bi bi-upc-scan"></i>
+      </button>
+    </div>
+    <a href="/storages/{item.storage_id}/items/{item.id}" class="btn btn-primary btn-sm">View Details</a>
+  </div>
+  {#if showQRCode}
+    <div class="p-3">
+      <QRCode entityId={item.id} entityType="item" />
     </div>
   {/if}
-  <button on:click={() => showQRCode = !showQRCode}>
-    {showQRCode ? "Hide" : "Show"} QR Code
-  </button>
-  <button on:click={() => showBarcode = !showBarcode}>
-    {showBarcode ? "Hide" : "Show"} Barcode
-  </button>
-  {#if showQRCode}
-    <QRCode entityId={item.id} entityType="item" />
-  {/if}
   {#if showBarcode}
-    <Barcode data={item.id} />
+    <div class="p-3">
+      <Barcode data={item.id} />
+    </div>
   {/if}
 </div>
-
-<style>
-  .card {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
-  }
-
-  span {
-    display: inline-block;
-    background-color: #eee;
-    padding: 2px 5px;
-    border-radius: 3px;
-    margin-right: 5px;
-  }
-</style>
