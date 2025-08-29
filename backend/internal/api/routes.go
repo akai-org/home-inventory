@@ -295,8 +295,8 @@ func (a *App) SearchItems(w http.ResponseWriter, r *http.Request) {
 
 func (a *App) GenerateQRCode(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		EntityID   uuid.UUID `json:"entity_id"`
-		EntityType string    `json:"entity_type"`
+		EntityID   string `json:"entity_id"`
+		EntityType string `json:"entity_type"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -309,11 +309,32 @@ func (a *App) GenerateQRCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	entityID, err := uuid.Parse(req.EntityID)
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "Invalid entity_id format", err)
+		return
+	}
+
+	// Check if a QR code already exists for the given entity
+	existingQRCode, err := a.Database.GetQRCodeByEntityID(r.Context(), entityID)
+	if err == nil {
+		png, err := qrcode.Encode(existingQRCode.CodeData, qrcode.Medium, 256)
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, "Failed to generate QR code", err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "image/png")
+		w.WriteHeader(http.StatusOK)
+		w.Write(png)
+		return
+	}
+
 	// Generate QR code data (URL to entity)
-	codeData := req.EntityID.String()
+	codeData := req.EntityID
 
 	qrCode := &models.QRCode{
-		EntityID:   req.EntityID,
+		EntityID:   entityID,
 		EntityType: req.EntityType,
 		CodeData:   codeData,
 	}
@@ -365,7 +386,16 @@ func (a *App) GenerateBarcode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	scaled, err := barcode.Scale(b, 256, 50)
+	// Dynamically calculate width and height
+	width := b.Bounds().Dx()
+	height := 50
+
+	// Add a maximum width to prevent the barcode from becoming too wide
+	if width > 500 {
+		width = 500
+	}
+
+	scaled, err := barcode.Scale(b, width, height)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "Failed to scale barcode", err)
 		return

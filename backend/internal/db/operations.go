@@ -384,3 +384,25 @@ func (p *Postgres) GetQRCode(ctx context.Context, codeData string) (*models.QRCo
 
 	return qrCode, err
 }
+
+func (p *Postgres) GetQRCodeByEntityID(ctx context.Context, entityID uuid.UUID) (*models.QRCode, error) {
+	qrCode := &models.QRCode{}
+
+	query := `
+		SELECT id, entity_id, entity_type, code_data, created_at
+		FROM qr_codes WHERE entity_id = $1`
+
+	err := p.db.QueryRowContext(ctx, query, entityID).Scan(
+		&qrCode.ID,
+		&qrCode.EntityID,
+		&qrCode.EntityType,
+		&qrCode.CodeData,
+		&qrCode.CreatedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("qr code not found")
+	}
+
+	return qrCode, err
+}

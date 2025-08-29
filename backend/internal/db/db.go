@@ -35,6 +35,7 @@ type DB interface {
 	// QR Code operations
 	CreateQRCode(ctx context.Context, qrCode *models.QRCode) error
 	GetQRCode(ctx context.Context, codeData string) (*models.QRCode, error)
+	GetQRCodeByEntityID(ctx context.Context, entityID uuid.UUID) (*models.QRCode, error)
 
 	// Migration operations
 	RunMigrations(migrationsPath string) error
