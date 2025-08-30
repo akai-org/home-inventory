@@ -2,17 +2,20 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"image/png"
 	"net/http"
+	"strings"
 
 	"github.com/akai-org/home-inventory/internal/db"
 	"github.com/akai-org/home-inventory/internal/models"
 	"github.com/google/uuid"
+	"github.com/huntclauss/dotenv"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/code128"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	qrcode "github.com/skip2/go-qrcode"
 )
 
@@ -130,7 +133,8 @@ func (a *App) GetStorage(w http.ResponseWriter, r *http.Request) {
 	storage, err := a.Database.GetStorage(r.Context(), id)
 	if err != nil {
 		writeError(w, http.StatusNotFound, "Storage not found", err)
-		return	}
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(storage)
@@ -315,10 +319,16 @@ func (a *App) GenerateQRCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	serverAddress := dotenv.Get("SERVER_ADDRESS")
+
 	// Check if a QR code already exists for the given entity
 	existingQRCode, err := a.Database.GetQRCodeByEntityID(r.Context(), entityID)
 	if err == nil {
-		png, err := qrcode.Encode(existingQRCode.CodeData, qrcode.Medium, 256)
+		codeData := existingQRCode.CodeData
+		if !strings.HasPrefix(codeData, "http") {
+			codeData = serverAddress + codeData
+		}
+		png, err := qrcode.Encode(codeData, qrcode.Medium, 256)
 		if err != nil {
 			writeError(w, http.StatusInternalServerError, "Failed to generate QR code", err)
 			return
@@ -331,7 +341,19 @@ func (a *App) GenerateQRCode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generate QR code data (URL to entity)
-	codeData := req.EntityID
+	var codeData string
+	if req.EntityType == "item" {
+		item, err := a.Database.GetItem(r.Context(), entityID)
+		if err != nil {
+			writeError(w, http.StatusNotFound, "Item not found", err)
+			return
+		}
+		codeData = "/storages/" + item.StorageID.String() + "/items/" + item.ID.String()
+	} else {
+		codeData = "/storages/" + entityID.String()
+	}
+	codeData = serverAddress + codeData
+	fmt.Println("Generated QR code data:", codeData)
 
 	qrCode := &models.QRCode{
 		EntityID:   entityID,
@@ -364,8 +386,7 @@ func (a *App) ResolveQRCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(qrCode)
+	http.Redirect(w, r, qrCode.CodeData, http.StatusFound)
 }
 
 // Barcode handlers
