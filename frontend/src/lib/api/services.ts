@@ -23,6 +23,14 @@ export async function createItem(item: Item): Promise<Item> {
     return await response.json();
 }
 
+export async function getItem(id: string): Promise<Item> {
+    const response = await fetch(`/api/v1/items/${id}`);
+    if (!response.ok) {
+        throw new Error("Failed to fetch item");
+    }
+    return await response.json();
+}
+
 export async function listStorages(): Promise<Storage[]> {
     const response = await fetch("/api/v1/storages");
     if (!response.ok) {
@@ -41,6 +49,14 @@ export async function createStorage(storage: Storage): Promise<Storage> {
     });
     if (!response.ok) {
         throw new Error("Failed to create storage");
+    }
+    return await response.json();
+}
+
+export async function getStorage(id: string): Promise<Storage> {
+    const response = await fetch(`/api/v1/storages/${id}`);
+    if (!response.ok) {
+        throw new Error("Failed to fetch storage");
     }
     return await response.json();
 }
