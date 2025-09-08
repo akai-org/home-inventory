@@ -37,13 +37,9 @@
     <a href="/storages/{item.storage_id}/items/{item.id}" class="btn btn-primary btn-sm">View Details</a>
   </div>
   {#if showQRCode}
-    <div class="p-3">
-      <QRCode entityId={item.id} entityType="item" />
-    </div>
+    <QRCode entityId={item.id} show={showQRCode} entityType="item" on:close={() => (showQRCode = false)} />
   {/if}
   {#if showBarcode}
-    <div class="p-3">
-      <Barcode data={item.id} />
-    </div>
+    <Barcode data={item.id} show={showBarcode} on:close={() => (showBarcode = false)} />
   {/if}
 </div>

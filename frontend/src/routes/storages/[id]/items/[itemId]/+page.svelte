@@ -36,7 +36,7 @@
         <h1>{item.name}</h1>
         <p class="lead">{item.description}</p>
         <p><strong>Type:</strong> {item.type}</p>
-        <p><strong>Location:</strong> {storage.location}</p>
+        <p><strong>Location:</strong> {storage.name}</p>
         {#if item.tags && item.tags.length > 0}
           <div>
             <strong>Tags:</strong>
