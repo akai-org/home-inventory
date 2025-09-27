@@ -19,24 +19,58 @@
   }
 </script>
 
-<h1 class="mb-4">Storage: {storageId}</h1>
+<div class="page-header">
+  <h1 class="storage-title">Storage: {storageId}</h1>
+</div>
 
-<div class="row">
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Add New Item</h5>
-        <ItemForm {storageId} on:addItem={handleAddItem} />
-      </div>
+<div class="page-layout">
+  <div class="form-column">
+    <div class="form-container">
+      <h5 class="form-title">Add New Item</h5>
+      <ItemForm {storageId} on:addItem={handleAddItem} />
     </div>
   </div>
-  <div class="col-md-8">
-    <div class="row">
+  <div class="items-column">
+    <div class="item-grid">
       {#each items as item}
-        <div class="col-md-6 col-lg-4 mb-4">
-          <ItemCard {item} />
-        </div>
+        <ItemCard {item} />
       {/each}
     </div>
   </div>
 </div>
+
+<style>
+  .page-header {
+    margin-bottom: 2rem;
+  }
+
+  .storage-title {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  .page-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+  }
+
+  .form-container {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .form-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .item-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+</style>

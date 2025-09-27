@@ -41,57 +41,168 @@
   }
 </script>
 
-<div class="container-fluid py-4">
-  <div class="row">
-    <div class="col-md-3">
-      <div class="card mb-4">
-        <div class="card-body">
-          <h5 class="card-title mb-3"><i class="bi bi-funnel-fill me-2"></i>Filters</h5>
-          <ItemFilter on:filter={handleFilter} />
+
+<div class="page-layout">
+  <div class="sidebar-column">
+    <div class="filter-section">
+      <h5 class="section-title"><i class="bi bi-funnel-fill me-2"></i>Filters</h5>
+      <ItemFilter on:filter={handleFilter} />
+    </div>
+    <div class="storage-section">
+      <h5 class="section-title"><i class="bi bi-hdd-stack-fill me-2"></i>Storages</h5>
+      <StorageList />
+    </div>
+  </div>
+  <div class="main-column">
+    <div class="header">
+      <h1 class="page-title">Inventory</h1>
+      <div class="actions">
+        <div class="search-bar">
+          <i class="bi bi-search"></i>
+          <input type="text" placeholder="Search by name..." on:input={(e) => handleFilter({ detail: { name: e.currentTarget.value, type: '', tags: '' }, bubbles: false, cancelable: false, composed: false,timeStamp: 0, isTrusted: false, type: ''})}>
         </div>
-      </div>
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title mb-3"><i class="bi bi-hdd-stack-fill me-2"></i>Storages</h5>
-          <StorageList />
-        </div>
+        <button class="add-item-button" on:click={() => showAddItemModal = true}><i class="bi bi-plus-lg me-2"></i>Add Item</button>
       </div>
     </div>
-    <div class="col-md-9">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h3 mb-0">Inventory</h1>
-        <div class="d-flex">
-          <div class="input-group me-2">
-            <span class="input-group-text"><i class="bi bi-search"></i></span>
-            <input type="text" class="form-control" placeholder="Search by name..." on:input={(e) => handleFilter({ detail: { name: e.currentTarget.value, type: '', tags: '' }, bubbles: false, cancelable: false, composed: false,timeStamp: 0, isTrusted: false, type: ''})}>
-          </div>
-          <button class="btn btn-primary" on:click={() => showAddItemModal = true}><i class="bi bi-plus-lg me-2"></i>Add Item</button>
-        </div>
-      </div>
-      <div class="row">
-        {#each items as item}
-          <div class="col-md-6 col-lg-4 mb-4">
-            <ItemCard {item} />
-          </div>
-        {/each}
-      </div>
+    <div class="item-grid">
+      {#each items as item}
+        <ItemCard {item} />
+      {/each}
     </div>
   </div>
 </div>
 
 {#if showAddItemModal}
-  <div class="modal fade show d-block" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Add New Item</h5>
-          <button type="button" class="btn-close" on:click={() => showAddItemModal = false}></button>
-        </div>
-        <div class="modal-body">
-          <ItemForm on:addItem={handleAddItem} {storages} />
-        </div>
+  <div class="modal-overlay" on:click={() => showAddItemModal = false}>
+    <div class="modal-content" on:click|stopPropagation>
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Item</h5>
+        <button type="button" class="close-button" on:click={() => showAddItemModal = false}>&times;</button>
+      </div>
+      <div class="modal-body">
+        <ItemForm on:addItem={handleAddItem} {storages} />
       </div>
     </div>
   </div>
-  <div class="modal-backdrop fade show"></div>
 {/if}
+
+<style>
+  .page-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
+  }
+
+  .sidebar-column .section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .filter-section, .storage-section {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  .search-bar input {
+    border: none;
+    outline: none;
+    margin-left: 0.5rem;
+  }
+
+  .add-item-button {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .add-item-button:hover {
+    background-color: #357abd;
+  }
+
+  .item-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    width: 90%;
+    max-width: 500px;
+  }
+
+  .modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+  }
+</style>
