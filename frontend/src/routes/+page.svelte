@@ -20,7 +20,7 @@
     const newItem = event.detail;
 		if (newItem.name && newItem.type && newItem.description && newItem.storage_id) {
 			const createdItem = await createItem(newItem as Item);
-			items = [...items, createdItem];
+			items = await listItems();
       showAddItemModal = false;
 		}
 	}
